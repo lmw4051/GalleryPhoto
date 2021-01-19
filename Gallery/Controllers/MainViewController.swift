@@ -11,11 +11,12 @@ import UIKit
 class MainViewController: UIViewController {
   // MARK: - Properties
   var galleryItems = [GalleryItem]()
-  
+    
   private lazy var collectionView: UICollectionView = {
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     collectionView.dataSource = self
-    collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.reuseIdentifier)    
+    collectionView.delegate = self
+    collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.reuseIdentifier)
     return collectionView
   }()
   
@@ -55,6 +56,7 @@ class MainViewController: UIViewController {
   }
 }
 
+// MARK: - UICollectionViewDataSource Methods
 extension MainViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {    
     return galleryItems.count
@@ -64,5 +66,12 @@ extension MainViewController: UICollectionViewDataSource {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as! PhotoCell
     cell.gallery = galleryItems[indexPath.item]
     return cell
+  }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout Methods
+extension MainViewController: UICollectionViewDelegateFlowLayout {
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    return .init(width: view.frame.width - 16 * 2, height: 200)
   }
 }
