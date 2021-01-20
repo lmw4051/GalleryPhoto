@@ -13,7 +13,7 @@ class Service {
   
   func loadPhotos(perPage: Int = 15,
                   pageNumber: Int = 0,
-                  completion: @escaping ([GalleryPhoto]?, Error?) -> Void) {
+                  completion: @escaping ([PhotoItem]?, Error?) -> Void) {
     var components = URLComponents()
     components.scheme = AppConstants.scheme
     components.host = AppConstants.host
@@ -35,11 +35,52 @@ class Service {
       guard let data = data else { return }
       
       do {
-        let objects = try JSONDecoder().decode([GalleryPhoto].self, from: data)
-        completion(objects, nil)
+        let photoItems = try JSONDecoder().decode([PhotoItem].self, from: data)
+        completion(photoItems, nil)
       } catch let jsonError {
         completion(nil, jsonError)
       }
     }.resume()
   }
+  
+  func loadPhotos(query: String,
+                  perPage: Int = 15,
+                  pageNumber: Int = 0,
+                  completion: @escaping ([PhotoItem]?, Error?) -> Void) {
+    var components = URLComponents()
+      components.scheme = AppConstants.scheme
+      components.host = AppConstants.host
+      components.path = AppConstants.photosSearchPath
+      components.queryItems = [
+        URLQueryItem(name: "client_id", value: UnSplashKey),
+        URLQueryItem(name: "page", value: "\(pageNumber)"),
+        URLQueryItem(name: "per_page", value: "\(perPage)"),
+        URLQueryItem(name: "query", value: query)
+      ]
+      
+      guard let url = components.url else { return }
+      
+      URLSession.shared.dataTask(with: url) { (data, response, error) in
+        if let error = error {
+          completion(nil, error)
+          return
+        }
+        
+        guard let data = data else { return }
+        
+        var photoItems = [PhotoItem]()
+        
+        do {
+          let searchResponse = try JSONDecoder().decode(SearchResponse.self, from: data)
+          print(searchResponse)
+          
+          for photoItem in searchResponse.results! {
+            photoItems.append(photoItem)
+          }
+          completion(photoItems, nil)
+        } catch let jsonError {
+          completion(nil, jsonError)
+        }
+      }.resume()
+    }
 }

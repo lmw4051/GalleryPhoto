@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct GalleryPhoto: Codable {
+struct PhotoItem: Codable {
   let urls: URLKind
   let width: Int
   let height: Int
@@ -20,4 +20,10 @@ struct URLKind: Codable {
   let regular: String
   let small: String
   let thumb: String
+}
+
+struct SearchResponse: Decodable {
+  let total: Int?
+  let totalPages: Int?
+  let results: [PhotoItem]?
 }

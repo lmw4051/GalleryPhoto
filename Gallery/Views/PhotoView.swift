@@ -30,7 +30,7 @@ class PhotoView: UIView {
     imageView.image = nil
   }
   
-  func configure(with photo: GalleryPhoto) {
+  func configure(with photo: PhotoItem) {
     imageView.sd_setImage(with: URL(string: photo.urls.regular))
   }
 }

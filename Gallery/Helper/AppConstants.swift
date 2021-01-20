@@ -12,4 +12,5 @@ enum AppConstants {
   static let scheme = "https"
   static let host = "api.unsplash.com"
   static let photosPath = "/photos/"
+  static let photosSearchPath = "/search/photos/"
 }

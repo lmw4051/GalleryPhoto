@@ -10,8 +10,9 @@ import UIKit
 
 class MainViewController: UIViewController {
   // MARK: - Properties
-  var galleryItems = [GalleryPhoto]()
+  var galleryItems = [PhotoItem]()
   
+  // MARK: - UICollectionView
   private lazy var layout = WaterfallLayout(with: self)
   
   private lazy var collectionView: UICollectionView = {
@@ -25,31 +26,46 @@ class MainViewController: UIViewController {
     return collectionView
   }()
   
+  // MARK: - For Pagination
   var pageNumber = 1
   private(set) var isFetching = false
+  
+  // MARK: - For Searching
+  var searchController = UISearchController(searchResultsController: nil)
+  var query = ""
   
   // MARK: - View Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    
     getPhotoItems()
     setupCollectionView()
   }
   
-  // Helper Methods
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    setupNavBar()
+  }
+  
+  // MARK: - Helper Methods
+  fileprivate func setupNavBar() {
+    searchController.searchBar.delegate = self
+    navigationItem.hidesSearchBarWhenScrolling = false
+    navigationItem.searchController = searchController
+  }
+  
   fileprivate func setupCollectionView() {
     view.addSubview(collectionView)
     collectionView.fillSuperview()
   }
   
   fileprivate func getMoreItems() {
-    getPhotoItems()
+    getPhotoItems(query: query)
   }
   
-  fileprivate func getPhotoItems() {
+  fileprivate func getPhotoItems(query: String = "") {
     isFetching = true
     
-    Service.shared.loadPhotos(perPage: 10, pageNumber: pageNumber) { (items, error) in
+    let completionHandler: (([PhotoItem]?, Error?) -> Void) = { (items, error) in
       if let error = error {
         self.isFetching = false
         print("Failed to fetch:", error)
@@ -70,6 +86,21 @@ class MainViewController: UIViewController {
       DispatchQueue.main.async {
         self.collectionView.reloadData()
       }
+    }
+    
+    if query.isEmpty {
+      Service.shared.loadPhotos(perPage: 10, pageNumber: pageNumber, completion: completionHandler)
+    } else {
+      Service.shared.loadPhotos(query: query, perPage: 10, pageNumber: pageNumber, completion: completionHandler)
+    }
+  }
+  
+  fileprivate func clearPhotoItems() {
+    pageNumber = 1
+    galleryItems = [PhotoItem]()
+    
+    DispatchQueue.main.async {
+      self.collectionView.reloadData()
     }
   }
 }
@@ -109,5 +140,20 @@ extension MainViewController: WaterfallLayoutDelegate {
   func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let photo = galleryItems[indexPath.item]
     return .init(width: photo.width, height: photo.height)
+  }
+}
+
+extension MainViewController: UISearchBarDelegate {
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    clearPhotoItems()
+    
+    if let searchText = searchBar.text {
+      if searchText == "" {
+        getPhotoItems()
+      }
+      
+      query = searchText
+      getPhotoItems(query: query)
+    }
   }
 }

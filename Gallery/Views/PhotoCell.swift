@@ -13,7 +13,7 @@ class PhotoCell: UICollectionViewCell {
   // MARK: - Properties
   static let reuseIdentifier = "PhotoCell"
   
-  var photo: GalleryPhoto! {
+  var photo: PhotoItem! {
     didSet {
       photoView.configure(with: photo)
     }
