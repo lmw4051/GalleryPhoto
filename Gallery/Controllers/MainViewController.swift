@@ -11,12 +11,14 @@ import UIKit
 class MainViewController: UIViewController {
   // MARK: - Properties
   var galleryItems = [GalleryItem]()
-    
+  
+  private lazy var layout = WaterfallLayout(with: self)
+  
   private lazy var collectionView: UICollectionView = {
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     collectionView.dataSource = self
-    collectionView.delegate = self
     collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.reuseIdentifier)
+    collectionView.layoutMargins = UIEdgeInsets(top: 0.0, left: 16.0, bottom: 0.0, right: 16.0)
     return collectionView
   }()
   
@@ -35,7 +37,7 @@ class MainViewController: UIViewController {
         print("Failed to fetch:", error)
         return
       }
-            
+      
       guard let items = items else { return }
       
       for item in items {
@@ -69,9 +71,10 @@ extension MainViewController: UICollectionViewDataSource {
   }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout Methods
-extension MainViewController: UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return .init(width: view.frame.width - 16 * 2, height: 200)
+// MARK: - WaterfallLayoutDelegate
+extension MainViewController: WaterfallLayoutDelegate {
+  func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    let photo = galleryItems[indexPath.item]
+    return .init(width: photo.width, height: photo.height)
   }
 }

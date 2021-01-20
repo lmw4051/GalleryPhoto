@@ -10,6 +10,8 @@ import Foundation
 
 struct GalleryItem: Codable {
   let urls: Urls
+  let width: Int
+  let height: Int
 }
 
 struct Urls: Codable {

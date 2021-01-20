@@ -19,6 +19,8 @@
 		5445698925B7499A00DE4097 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445698825B7499A00DE4097 /* MainViewController.swift */; };
 		5445698C25B7502000DE4097 /* UIView+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445698B25B7502000DE4097 /* UIView+Layout.swift */; };
 		5445698F25B7505100DE4097 /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445698E25B7505100DE4097 /* PhotoCell.swift */; };
+		5445699625B75BB800DE4097 /* WaterfallLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445699525B75BB800DE4097 /* WaterfallLayout.swift */; };
+		5445699825B75BD200DE4097 /* PagingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445699725B75BD200DE4097 /* PagingView.swift */; };
 		969BF5E1CEC6A5C5F63018F1 /* Pods_Gallery.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA853EB673A88E3C742830B7 /* Pods_Gallery.framework */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +40,8 @@
 		5445698825B7499A00DE4097 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		5445698B25B7502000DE4097 /* UIView+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Layout.swift"; sourceTree = "<group>"; };
 		5445698E25B7505100DE4097 /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
+		5445699525B75BB800DE4097 /* WaterfallLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterfallLayout.swift; sourceTree = "<group>"; };
+		5445699725B75BD200DE4097 /* PagingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagingView.swift; sourceTree = "<group>"; };
 		A9BCABA1C59740D689323AD6 /* Pods-Gallery.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Gallery.debug.xcconfig"; path = "Target Support Files/Pods-Gallery/Pods-Gallery.debug.xcconfig"; sourceTree = "<group>"; };
 		EA853EB673A88E3C742830B7 /* Pods_Gallery.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Gallery.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -136,6 +140,8 @@
 			isa = PBXGroup;
 			children = (
 				5445698E25B7505100DE4097 /* PhotoCell.swift */,
+				5445699525B75BB800DE4097 /* WaterfallLayout.swift */,
+				5445699725B75BD200DE4097 /* PagingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -264,6 +270,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5445699825B75BD200DE4097 /* PagingView.swift in Sources */,
 				5445698C25B7502000DE4097 /* UIView+Layout.swift in Sources */,
 				5445698F25B7505100DE4097 /* PhotoCell.swift in Sources */,
 				5445698925B7499A00DE4097 /* MainViewController.swift in Sources */,
@@ -272,6 +279,7 @@
 				5445697C25B7480F00DE4097 /* ApiKeys.swift in Sources */,
 				5445698525B7493000DE4097 /* AppConstants.swift in Sources */,
 				5445695225B6FD1700DE4097 /* SceneDelegate.swift in Sources */,
+				5445699625B75BB800DE4097 /* WaterfallLayout.swift in Sources */,
 				5445698225B7488800DE4097 /* GalleryItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

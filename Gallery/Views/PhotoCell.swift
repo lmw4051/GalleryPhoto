@@ -24,7 +24,6 @@ class PhotoCell: UICollectionViewCell {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = .blue
     imageView.fillSuperview()
     addSubview(imageView)
     imageView.fillSuperview()
