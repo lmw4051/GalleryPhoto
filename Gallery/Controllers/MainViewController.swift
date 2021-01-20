@@ -17,44 +17,60 @@ class MainViewController: UIViewController {
   private lazy var collectionView: UICollectionView = {
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     collectionView.dataSource = self
+    collectionView.delegate = self
     collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.reuseIdentifier)
+    collectionView.register(PagingView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: PagingView.reuseIdentifier)
     collectionView.layoutMargins = UIEdgeInsets(top: 0.0, left: 16.0, bottom: 0.0, right: 16.0)
+    collectionView.backgroundColor = .white
     return collectionView
   }()
+  
+  var pageNumber = 1
+  private(set) var isFetching = false
   
   // MARK: - View Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .red
     
-    getItems()
+    getPhotoItems()
     setupCollectionView()
   }
   
-  fileprivate func getItems() {
-    Service.shared.loadPhotos(perPage: 10, pageNumber: 15) { (items, error) in
+  // Helper Methods
+  fileprivate func setupCollectionView() {
+    view.addSubview(collectionView)
+    collectionView.fillSuperview()
+  }
+  
+  fileprivate func getMoreItems() {
+    getPhotoItems()
+  }
+  
+  fileprivate func getPhotoItems() {
+    isFetching = true
+    
+    Service.shared.loadPhotos(perPage: 10, pageNumber: pageNumber) { (items, error) in
       if let error = error {
+        self.isFetching = false
         print("Failed to fetch:", error)
         return
       }
       
-      guard let items = items else { return }
+      guard let items = items else {
+        self.isFetching = false
+        return
+      }
       
       for item in items {
         self.galleryItems.append(item)
       }
       
-      print(self.galleryItems)
+      self.isFetching = false
       
       DispatchQueue.main.async {
         self.collectionView.reloadData()
       }
     }
-  }
-  
-  fileprivate func setupCollectionView() {
-    view.addSubview(collectionView)
-    collectionView.fillSuperview()
   }
 }
 
@@ -68,6 +84,23 @@ extension MainViewController: UICollectionViewDataSource {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as! PhotoCell
     cell.photo = galleryItems[indexPath.item]
     return cell
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+    let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: PagingView.reuseIdentifier, for: indexPath)
+    guard let pagingView = view as? PagingView else { return view }
+    pagingView.isLoading = isFetching
+    return pagingView
+  }
+}
+
+// MARK: - UICollectionViewDelegate Methods
+extension MainViewController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    if indexPath.item == collectionView.numberOfItems(inSection: indexPath.section) - 5 {
+      pageNumber += 1
+      getMoreItems()
+    }
   }
 }
 
