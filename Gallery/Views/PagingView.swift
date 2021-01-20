@@ -16,9 +16,13 @@ class PagingView: UICollectionReusableView {
   static var reuseIdentifier = "PagingView"
   
   private let spinner: UIActivityIndicatorView = {
-    let spinner = UIActivityIndicatorView(style: .medium)
-    spinner.translatesAutoresizingMaskIntoConstraints = false
-    return spinner
+    if #available(iOS 13.0, *) {
+      let spinner = UIActivityIndicatorView(style: .medium)
+      return spinner
+    } else {
+      let spinner = UIActivityIndicatorView(style: .gray)
+      return spinner
+    }
   }()
   
   var isLoading = false {
@@ -49,12 +53,7 @@ class PagingView: UICollectionReusableView {
   
   private func setupSpinner() {
     addSubview(spinner)
-    
-    NSLayoutConstraint.activate([
-      spinner.centerXAnchor.constraint(equalTo: centerXAnchor),
-      spinner.centerYAnchor.constraint(equalTo: centerYAnchor)
-    ])
+    spinner.centerInSuperview()
   }
-  
 }
 
