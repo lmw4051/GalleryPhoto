@@ -13,7 +13,7 @@ class Service {
   
   func loadPhotos(perPage: Int = 15,
                   pageNumber: Int = 0,
-                  completion: @escaping ([GalleryItem]?, Error?) -> Void) {
+                  completion: @escaping ([GalleryPhoto]?, Error?) -> Void) {
     var components = URLComponents()
     components.scheme = AppConstants.scheme
     components.host = AppConstants.host
@@ -35,7 +35,7 @@ class Service {
       guard let data = data else { return }
       
       do {
-        let objects = try JSONDecoder().decode([GalleryItem].self, from: data)
+        let objects = try JSONDecoder().decode([GalleryPhoto].self, from: data)
         completion(objects, nil)
       } catch let jsonError {
         completion(nil, jsonError)

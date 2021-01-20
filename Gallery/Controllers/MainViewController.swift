@@ -10,7 +10,7 @@ import UIKit
 
 class MainViewController: UIViewController {
   // MARK: - Properties
-  var galleryItems = [GalleryItem]()
+  var galleryItems = [GalleryPhoto]()
   
   private lazy var layout = WaterfallLayout(with: self)
   
@@ -66,7 +66,7 @@ extension MainViewController: UICollectionViewDataSource {
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as! PhotoCell
-    cell.gallery = galleryItems[indexPath.item]
+    cell.photo = galleryItems[indexPath.item]
     return cell
   }
 }

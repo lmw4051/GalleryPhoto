@@ -8,13 +8,13 @@
 
 import Foundation
 
-struct GalleryItem: Codable {
-  let urls: Urls
+struct GalleryPhoto: Codable {
+  let urls: URLKind
   let width: Int
   let height: Int
 }
 
-struct Urls: Codable {
+struct URLKind: Codable {
   let raw: String
   let full: String
   let regular: String

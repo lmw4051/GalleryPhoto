@@ -11,25 +11,42 @@ import SDWebImage
 
 class PhotoCell: UICollectionViewCell {
   // MARK: - Properties
-  var gallery: GalleryItem! {
+  static let reuseIdentifier = "PhotoCell"
+  
+  var photo: GalleryPhoto! {
     didSet {
-      print(gallery.urls)
-      imageView.sd_setImage(with: URL(string: gallery.urls.regular))
+      photoView.configure(with: photo)
     }
   }
   
-  static let reuseIdentifier = "PhotoCell"
+  let photoView: PhotoView = {
+    let photoView = PhotoView()
+    return photoView
+  }()
   
-  let imageView = UIImageView(cornerRadius: 0)
-  
+  // MARK: - View Lifecycle
   override init(frame: CGRect) {
     super.init(frame: frame)
-    imageView.fillSuperview()
-    addSubview(imageView)
-    imageView.fillSuperview()
+    initSetup()
   }
   
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
+    initSetup()
+  }
+  
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    photoView.prepareForReuse()
+  }
+  
+  // MARK: - Helper Methods
+  func initSetup() {
+    setupPhotoView()
+  }
+  
+  func setupPhotoView() {
+    contentView.addSubview(photoView)
+    photoView.fillSuperview()
   }
 }
