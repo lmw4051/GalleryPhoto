@@ -58,6 +58,7 @@ class MainViewController: UIViewController {
   fileprivate func setupSearchController() {
     searchController.searchBar.delegate = self
     searchController.searchBar.placeholder = "Search Images"
+    searchController.searchBar.returnKeyType = UIReturnKeyType.search
     searchController.obscuresBackgroundDuringPresentation = false
   }
     
@@ -140,6 +141,13 @@ extension MainViewController: UICollectionViewDelegate {
       pageNumber += 1
       getMoreItems()
     }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    let photoItem = galleryItems[indexPath.item]
+    let vc = PhotoDetailViewController()
+    vc.photoItem = photoItem
+    navigationController?.pushViewController(vc, animated: true)
   }
 }
 

@@ -31,6 +31,6 @@ class PhotoView: UIView {
   }
   
   func configure(with photo: PhotoItem) {
-    imageView.sd_setImage(with: URL(string: photo.urls.regular))
+    imageView.sd_setImage(with: URL(string: photo.urls.thumb))
   }
 }
