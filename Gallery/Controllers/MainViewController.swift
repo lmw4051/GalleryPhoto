@@ -48,11 +48,19 @@ class MainViewController: UIViewController {
   
   // MARK: - Helper Methods
   fileprivate func setupNavBar() {
-    searchController.searchBar.delegate = self
+    navigationItem.title = "Gallery"    
     navigationItem.hidesSearchBarWhenScrolling = false
     navigationItem.searchController = searchController
+    
+    setupSearchController()
   }
   
+  fileprivate func setupSearchController() {
+    searchController.searchBar.delegate = self
+    searchController.searchBar.placeholder = "Search Images"
+    searchController.obscuresBackgroundDuringPresentation = false
+  }
+    
   fileprivate func setupCollectionView() {
     view.addSubview(collectionView)
     collectionView.fillSuperview()
