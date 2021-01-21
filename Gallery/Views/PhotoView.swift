@@ -67,6 +67,7 @@ class PhotoView: UIView {
   
   func configure(with photo: PhotoItem, showUserName: Bool = true) {
     imageView.sd_setImage(with: URL(string: photo.urls.thumb))
+    imageView.backgroundColor = UIColor.hexStringToUIColor(hex: photo.color)
     nameLabel.text = photo.user.displayName
     showsUserName = showUserName
   }

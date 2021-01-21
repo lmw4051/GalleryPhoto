@@ -6,13 +6,14 @@
 //  Copyright © 2021 David. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-struct PhotoItem: Codable {
+struct PhotoItem: Decodable {
   let urls: URLKind
   let width: Int
   let height: Int
   let user: User
+  let color: String    
 }
 
 struct URLKind: Codable {
