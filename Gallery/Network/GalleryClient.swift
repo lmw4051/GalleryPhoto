@@ -8,11 +8,15 @@
 
 import Foundation
 
+typealias completionWithPhotoItems = ([PhotoItem]?) -> Void
+typealias completionWithError = (Error) -> Void
+
 protocol GalleryClientService {
   func loadPhotos(query: String,
   perPage: Int,
   pageNumber: Int,
-  completion: @escaping ([PhotoItem]?, Error?) -> Void)
+  completion: @escaping completionWithPhotoItems,
+  fail: @escaping completionWithError)
 }
 
 class GalleryClient {
@@ -21,7 +25,8 @@ class GalleryClient {
   func loadPhotos(query: String,
                   perPage: Int,
                   pageNumber: Int,
-                  completion: @escaping ([PhotoItem]?, Error?) -> Void) {
+                  completion: @escaping completionWithPhotoItems,
+                  fail: @escaping completionWithError) {
     var components = URLComponents()
     components.scheme = AppConstants.scheme
     components.host = AppConstants.host
@@ -47,7 +52,7 @@ class GalleryClient {
     
     URLSession.shared.dataTask(with: url) { (data, response, error) in
       if let error = error {
-        completion(nil, error)
+        fail(error)
         return
       }
       
@@ -58,9 +63,9 @@ class GalleryClient {
       if query == "" {
         do {
           let photoItems = try JSONDecoder().decode([PhotoItem].self, from: data)
-          completion(photoItems, nil)
+          completion(photoItems)
         } catch let jsonError {
-          completion(nil, jsonError)
+          fail(jsonError)
         }
       } else {
         do {
@@ -70,9 +75,9 @@ class GalleryClient {
           for photoItem in searchResponse.results! {
             photoItems.append(photoItem)
           }
-          completion(photoItems, nil)
+          completion(photoItems)
         } catch let jsonError {
-          completion(nil, jsonError)
+          fail(jsonError)
         }
       }
     }.resume()

@@ -10,6 +10,8 @@ import UIKit
 
 class PhotoViewcontroller: UIViewController {
   // MARK: - Properties
+  let photoVM = PhotoViewModel()
+  
   // UICollectionView
   private lazy var layout = WaterfallLayout(with: self)
   
@@ -23,10 +25,7 @@ class PhotoViewcontroller: UIViewController {
     collectionView.backgroundColor = .white
     return collectionView
   }()
-  
-  // For DataSource
-  var photoItems = [PhotoItem]()
-  
+    
   private let spinner: UIActivityIndicatorView = {
     if #available(iOS 13.0, *) {
       let spinner = UIActivityIndicatorView(style: .medium)
@@ -39,13 +38,8 @@ class PhotoViewcontroller: UIViewController {
     }
   }()
   
-  // For Pagination
-  var pageNumber = 1
-  private(set) var isFetching = false
-  
   // For Searching
   var searchController = UISearchController(searchResultsController: nil)
-  var query = ""
   
   // For Error Message
   private lazy var emptyView: EmptyView = {
@@ -57,7 +51,9 @@ class PhotoViewcontroller: UIViewController {
   // MARK: - View Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    getPhotoItems()
+    photoVM.delegate = self
+    
+    photoVM.getPhotoItems()
     setupCollectionView()
     setupSpinner()
   }
@@ -110,100 +106,24 @@ class PhotoViewcontroller: UIViewController {
   private func hideEmptyView() {
     emptyView.removeFromSuperview()
   }
-  
-  // MARK: - API Section
-  private func getMoreItems() {
-    getPhotoItems(query: query)
-  }
-  
-  private func getPhotoItems(query: String = "") {
-    isFetching = true
-    
-    if photoItems.count == 0 {
-      spinner.startAnimating()
-    }
-    
-    GalleryClient.shared.loadPhotos(query: query, perPage: 10, pageNumber: pageNumber) { [weak self] (items, error) in
-      guard let self = self else { return }
-      
-      if let error = error {
-        self.isFetching = false
-        
-        let state: EmptyViewState = (error as NSError).isNoInternetConnectionError() ? .noInternetConnection : .serverError
-        
-        DispatchQueue.main.async {
-          self.showEmptyView(with: state)
-        }
-        return
-      }
-      
-      guard let items = items, items.count > 0 else {
-        self.isFetching = false
-        
-        DispatchQueue.main.async {
-          self.showEmptyView(with: .noResult)
-        }
-        return
-      }
-      
-      for item in items {
-        self.photoItems.append(item)
-      }
-      
-      self.isFetching = false
-      
-      let newPhotosCount = items.count
-      let startIndex = self.photoItems.count - newPhotosCount
-      let endIndex = startIndex + newPhotosCount
-      var newIndexPaths = [IndexPath]()
-      
-      for index in startIndex..<endIndex {
-        newIndexPaths.append(IndexPath(item: index, section: 0))
-      }
-      
-      DispatchQueue.main.async {
-        self.spinner.stopAnimating()
-        self.hideEmptyView()
-                
-        let hasWindow = self.collectionView.window != nil
-        let collectionViewItemCount = self.collectionView.numberOfItems(inSection: 0)
-        
-        if hasWindow && collectionViewItemCount < self.photoItems.count {
-          self.collectionView.insertItems(at: newIndexPaths)
-          self.layout.invalidateLayout()
-        } else {
-          self.collectionView.reloadData()
-        }
-      }
-    }
-  }
-  
-  private func clearPhotoItems() {
-    pageNumber = 1
-    photoItems = [PhotoItem]()
-    
-    DispatchQueue.main.async {
-      self.collectionView.reloadData()
-    }
-  }
 }
 
 // MARK: - UICollectionViewDataSource Methods
 extension PhotoViewcontroller: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {    
-    return photoItems.count
+    return photoVM.photoItems.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as! PhotoCell
-    cell.photo = photoItems[indexPath.item]
+    cell.photo = photoVM.photoItems[indexPath.item]
     return cell
   }
   
   func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
     let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: PagingView.reuseIdentifier, for: indexPath)
     guard let pagingView = view as? PagingView else { return view }
-    pagingView.isLoading = isFetching
+    pagingView.isLoading = photoVM.isFetching
     return pagingView
   }
 }
@@ -212,13 +132,13 @@ extension PhotoViewcontroller: UICollectionViewDataSource {
 extension PhotoViewcontroller: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
     if indexPath.item == collectionView.numberOfItems(inSection: indexPath.section) - 5 {
-      pageNumber += 1
-      getMoreItems()
+      photoVM.pageNumber += 1
+      photoVM.getMoreItems()
     }
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    let photoItem = photoItems[indexPath.item]
+    let photoItem = photoVM.photoItems[indexPath.item]
     let vc = PhotoDetailViewController()
     vc.photoItem = photoItem
     navigationController?.pushViewController(vc, animated: true)
@@ -228,7 +148,7 @@ extension PhotoViewcontroller: UICollectionViewDelegate {
 // MARK: - WaterfallLayoutDelegate Method
 extension PhotoViewcontroller: WaterfallLayoutDelegate {
   func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let photo = photoItems[indexPath.item]
+    let photo = photoVM.photoItems[indexPath.item]
     return .init(width: photo.width, height: photo.height)
   }
 }
@@ -236,17 +156,58 @@ extension PhotoViewcontroller: WaterfallLayoutDelegate {
 // MARK: - UISearchBarDelegate Method
 extension PhotoViewcontroller: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    clearPhotoItems()
+    photoVM.clearPhotoItems()
     
     if let searchText = searchBar.text {
       hideEmptyView()
       
       if searchText == "" {
-        getPhotoItems()
+        photoVM.getPhotoItems()
       }
       
-      query = searchText
-      getPhotoItems(query: query)
+      photoVM.query = searchText
+      photoVM.getPhotoItems(query: photoVM.query)
+    }
+  }
+}
+
+extension PhotoViewcontroller: PhotoViewModelDelegate {
+  func photoItemsIsEmpty() {
+    spinner.startAnimating()
+  }
+  
+  func didNotGetAnyResult(state: EmptyViewState) {
+    DispatchQueue.main.async {
+      self.showEmptyView(with: .noResult)
+    }
+  }
+  
+  func updatePhotoItemData(newIndexPaths: [IndexPath]) {
+    DispatchQueue.main.async {
+      self.spinner.stopAnimating()
+      self.hideEmptyView()
+
+      let hasWindow = self.collectionView.window != nil
+      let collectionViewItemCount = self.collectionView.numberOfItems(inSection: 0)
+
+      if hasWindow && collectionViewItemCount < self.photoVM.photoItems.count {
+        self.collectionView.insertItems(at: newIndexPaths)
+        self.layout.invalidateLayout()
+      } else {
+        self.collectionView.reloadData()
+      }
+    }
+  }
+  
+  func getErrorFromService(state: EmptyViewState) {
+    DispatchQueue.main.async {
+      self.showEmptyView(with: state)
+    }
+  }
+  
+  func clearPhotoItems() {
+    DispatchQueue.main.async {
+      self.collectionView.reloadData()
     }
   }
 }
