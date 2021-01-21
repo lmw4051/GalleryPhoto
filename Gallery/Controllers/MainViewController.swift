@@ -48,7 +48,7 @@ class MainViewController: UIViewController {
   
   // MARK: - Helper Methods
   fileprivate func setupNavBar() {
-    navigationItem.title = "Gallery"    
+    navigationItem.title = "Gallery"
     navigationItem.hidesSearchBarWhenScrolling = false
     navigationItem.searchController = searchController
     

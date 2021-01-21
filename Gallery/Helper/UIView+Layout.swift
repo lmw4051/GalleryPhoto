@@ -117,6 +117,6 @@ extension UIImageView {
     self.init(image: nil)
     self.layer.cornerRadius = cornerRadius
     self.clipsToBounds = true
-    self.contentMode = .scaleAspectFill
+    self.contentMode = .scaleAspectFit
   }
 }

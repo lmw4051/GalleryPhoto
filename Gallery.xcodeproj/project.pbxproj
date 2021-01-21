@@ -24,6 +24,7 @@
 		5445699C25B7F52300DE4097 /* PhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445699B25B7F52300DE4097 /* PhotoView.swift */; };
 		5445699E25B80FE400DE4097 /* UIColor+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5445699D25B80FE400DE4097 /* UIColor+Additions.swift */; };
 		544569C525B8373600DE4097 /* PhotoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544569C425B8373600DE4097 /* PhotoDetailViewController.swift */; };
+		54FDC4CD25B94AD400411747 /* UIViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FDC4CC25B94AD400411747 /* UIViewController+Additions.swift */; };
 		969BF5E1CEC6A5C5F63018F1 /* Pods_Gallery.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA853EB673A88E3C742830B7 /* Pods_Gallery.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +49,7 @@
 		5445699B25B7F52300DE4097 /* PhotoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoView.swift; sourceTree = "<group>"; };
 		5445699D25B80FE400DE4097 /* UIColor+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Additions.swift"; sourceTree = "<group>"; };
 		544569C425B8373600DE4097 /* PhotoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailViewController.swift; sourceTree = "<group>"; };
+		54FDC4CC25B94AD400411747 /* UIViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Additions.swift"; sourceTree = "<group>"; };
 		A9BCABA1C59740D689323AD6 /* Pods-Gallery.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Gallery.debug.xcconfig"; path = "Target Support Files/Pods-Gallery/Pods-Gallery.debug.xcconfig"; sourceTree = "<group>"; };
 		EA853EB673A88E3C742830B7 /* Pods_Gallery.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Gallery.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -131,6 +133,7 @@
 				5445698425B7493000DE4097 /* AppConstants.swift */,
 				5445698B25B7502000DE4097 /* UIView+Layout.swift */,
 				5445699D25B80FE400DE4097 /* UIColor+Additions.swift */,
+				54FDC4CC25B94AD400411747 /* UIViewController+Additions.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				5445698925B7499A00DE4097 /* MainViewController.swift in Sources */,
 				5445695025B6FD1700DE4097 /* AppDelegate.swift in Sources */,
 				5445697F25B7485400DE4097 /* Service.swift in Sources */,
+				54FDC4CD25B94AD400411747 /* UIViewController+Additions.swift in Sources */,
 				5445697C25B7480F00DE4097 /* ApiKeys.swift in Sources */,
 				5445698525B7493000DE4097 /* AppConstants.swift in Sources */,
 				544569C525B8373600DE4097 /* PhotoDetailViewController.swift in Sources */,
