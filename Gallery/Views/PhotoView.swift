@@ -12,8 +12,7 @@ import SDWebImage
 class PhotoView: UIView {
   // MARK: - Properties
   private lazy var imageView = UIImageView(cornerRadius: 0)
-  private lazy var nameLabel = UILabel(text: "", font: .systemFont(ofSize: 13, weight: .medium), textColor: .white)
-  
+  private lazy var nameLabel = UILabel(text: "", font: .systemFont(ofSize: 13, weight: .medium), textColor: .white, textAlignment: .left)
   var gradientView = GradientView()
   
   var showsUserName = true {
@@ -22,6 +21,7 @@ class PhotoView: UIView {
       gradientView.alpha = showsUserName ? 1 : 0
     }
   }
+  
   // MARK: - View Lifecycle
   override init(frame: CGRect) {
     super.init(frame: frame)

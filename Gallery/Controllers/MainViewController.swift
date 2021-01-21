@@ -30,12 +30,10 @@ class MainViewController: UIViewController {
   private let spinner: UIActivityIndicatorView = {
     if #available(iOS 13.0, *) {
       let spinner = UIActivityIndicatorView(style: .medium)
-      spinner.translatesAutoresizingMaskIntoConstraints = false
       spinner.hidesWhenStopped = true
       return spinner
     } else {
-      let spinner = UIActivityIndicatorView(style: .gray)
-      spinner.translatesAutoresizingMaskIntoConstraints = false
+      let spinner = UIActivityIndicatorView(style: .gray)      
       spinner.hidesWhenStopped = true
       return spinner
     }
@@ -48,6 +46,13 @@ class MainViewController: UIViewController {
   // For Searching
   var searchController = UISearchController(searchResultsController: nil)
   var query = ""
+  
+  // For Error Message
+  private lazy var emptyView: EmptyView = {
+    let view = EmptyView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    return view
+  }()
   
   // MARK: - View Lifecycle
   override func viewDidLoad() {
@@ -88,6 +93,24 @@ class MainViewController: UIViewController {
     spinner.centerInSuperview()
   }
   
+  private func showEmptyView(with state: EmptyViewState) {
+    emptyView.state = state
+    guard emptyView.superview == nil else { return }
+    spinner.stopAnimating()
+    view.addSubview(emptyView)
+    
+    NSLayoutConstraint.activate([
+      emptyView.topAnchor.constraint(equalTo: view.topAnchor),
+      emptyView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      emptyView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      emptyView.rightAnchor.constraint(equalTo: view.rightAnchor)
+    ])
+  }
+  
+  private func hideEmptyView() {
+    emptyView.removeFromSuperview()
+  }
+  
   // MARK: - API Section
   private func getMoreItems() {
     getPhotoItems(query: query)
@@ -104,15 +127,24 @@ class MainViewController: UIViewController {
       guard let self = self else { return }
       
       if let error = error {
-        self.isFetching = false
-        self.spinner.stopAnimating()
         print("Failed to fetch:", error)
+        
+        let state: EmptyViewState = (error as NSError).isNoInternetConnectionError() ? .noInternetConnection : .serverError
+        
+        DispatchQueue.main.async {
+          self.showEmptyView(with: state)
+        }
+        
+        self.isFetching = false
         return
       }
       
-      guard let items = items else {
+      guard let items = items, items.count > 0 else {
         self.isFetching = false
-        self.spinner.stopAnimating()
+        
+        DispatchQueue.main.async {
+          self.showEmptyView(with: .noResult)
+        }
         return
       }
       
@@ -122,9 +154,28 @@ class MainViewController: UIViewController {
       
       self.isFetching = false
       
+      let newPhotosCount = items.count
+      let startIndex = self.photoItems.count - newPhotosCount
+      let endIndex = startIndex + newPhotosCount
+      var newIndexPaths = [IndexPath]()
+      
+      for index in startIndex..<endIndex {
+        newIndexPaths.append(IndexPath(item: index, section: 0))
+      }
+      
       DispatchQueue.main.async {
         self.spinner.stopAnimating()
-        self.collectionView.reloadData()
+        self.hideEmptyView()
+                
+        let hasWindow = self.collectionView.window != nil
+        let collectionViewItemCount = self.collectionView.numberOfItems(inSection: 0)
+        
+        if hasWindow && collectionViewItemCount < self.photoItems.count {
+          self.collectionView.insertItems(at: newIndexPaths)
+          self.layout.invalidateLayout()
+        } else {
+          self.collectionView.reloadData()
+        }
       }
     }
     
@@ -182,7 +233,7 @@ extension MainViewController: UICollectionViewDelegate {
   }
 }
 
-// MARK: - WaterfallLayoutDelegate
+// MARK: - WaterfallLayoutDelegate Method
 extension MainViewController: WaterfallLayoutDelegate {
   func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let photo = photoItems[indexPath.item]
@@ -190,11 +241,14 @@ extension MainViewController: WaterfallLayoutDelegate {
   }
 }
 
+// MARK: - UISearchBarDelegate Method
 extension MainViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     clearPhotoItems()
     
     if let searchText = searchBar.text {
+      hideEmptyView()
+      
       if searchText == "" {
         getPhotoItems()
       }
