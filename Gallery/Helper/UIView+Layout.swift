@@ -120,3 +120,18 @@ extension UIImageView {
     self.contentMode = .scaleAspectFit
   }
 }
+
+extension UILabel {
+  convenience init(text: String,
+                   font: UIFont,
+                   textColor: UIColor,
+                   numberOfLines: Int = 1) {
+    self.init(frame: .zero)
+    self.text = text
+    self.font = font
+    self.textColor = textColor
+    self.numberOfLines = numberOfLines
+    self.lineBreakMode = .byTruncatingTail
+    self.adjustsFontSizeToFitWidth = true
+  }
+}

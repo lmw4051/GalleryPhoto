@@ -12,6 +12,7 @@ struct PhotoItem: Codable {
   let urls: URLKind
   let width: Int
   let height: Int
+  let user: User
 }
 
 struct URLKind: Codable {
@@ -26,4 +27,31 @@ struct SearchResponse: Decodable {
   let total: Int?
   let totalPages: Int?
   let results: [PhotoItem]?
+}
+
+struct User: Codable {
+  let userName: String
+  let name: String?
+  let firstName: String?
+  let lastName: String?
+  
+  enum CodingKeys: String, CodingKey {
+    case userName = "username", name, firstName = "first_name", lastName = "last_name"
+  }
+}
+
+extension User {
+  var displayName: String {
+    if let name = name {
+      return name
+    }
+    
+    if let firstName = firstName {
+      if let lastName = lastName {
+        return "\(firstName) \(lastName)"
+      }
+      return firstName
+    }
+    return userName
+  }
 }
