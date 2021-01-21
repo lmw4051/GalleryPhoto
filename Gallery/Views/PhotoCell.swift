@@ -42,6 +42,8 @@ class PhotoCell: UICollectionViewCell {
   
   // MARK: - Helper Methods
   func initSetup() {
+    layer.cornerRadius = 8
+    clipsToBounds = true
     setupPhotoView()
   }
   
