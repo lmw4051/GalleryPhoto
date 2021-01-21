@@ -19,7 +19,7 @@ protocol GalleryClientService {
   fail: @escaping completionWithError)
 }
 
-class GalleryClient {
+class GalleryClient: GalleryClientService {
   static let shared = GalleryClient()
   
   func loadPhotos(query: String,
@@ -83,5 +83,3 @@ class GalleryClient {
     }.resume()
   }
 }
-
-extension GalleryClient: GalleryClientService {}

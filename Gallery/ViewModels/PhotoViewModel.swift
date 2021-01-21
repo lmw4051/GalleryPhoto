@@ -17,6 +17,7 @@ protocol PhotoViewModelDelegate: AnyObject {
 }
 
 class PhotoViewModel {
+  let clientService: GalleryClientService
   weak var delegate: PhotoViewModelDelegate?
   
   // For DataSource
@@ -27,6 +28,10 @@ class PhotoViewModel {
   private(set) var isFetching = false
   
   var query = ""
+  
+  init(clientService: GalleryClientService = GalleryClient()) {
+    self.clientService = clientService
+  }
   
   // MARK: - API Section
   func getMoreItems() {
@@ -40,7 +45,7 @@ class PhotoViewModel {
       delegate?.photoItemsIsEmpty()
     }
     
-    GalleryClient.shared.loadPhotos(query: query, perPage: 10, pageNumber: pageNumber, completion: { items in
+    clientService.loadPhotos(query: query, perPage: 10, pageNumber: pageNumber, completion: { items in
       guard let items = items, items.count > 0 else {
         self.isFetching = false
         self.delegate?.didNotGetAnyResult(state: .noResult)
