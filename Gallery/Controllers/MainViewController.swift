@@ -10,9 +10,7 @@ import UIKit
 
 class MainViewController: UIViewController {
   // MARK: - Properties
-  var galleryItems = [PhotoItem]()
-  
-  // MARK: - UICollectionView
+  // UICollectionView
   private lazy var layout = WaterfallLayout(with: self)
   
   private lazy var collectionView: UICollectionView = {
@@ -26,11 +24,28 @@ class MainViewController: UIViewController {
     return collectionView
   }()
   
-  // MARK: - For Pagination
+  // For DataSource
+  var photoItems = [PhotoItem]()
+  
+  private let spinner: UIActivityIndicatorView = {
+    if #available(iOS 13.0, *) {
+      let spinner = UIActivityIndicatorView(style: .medium)
+      spinner.translatesAutoresizingMaskIntoConstraints = false
+      spinner.hidesWhenStopped = true
+      return spinner
+    } else {
+      let spinner = UIActivityIndicatorView(style: .gray)
+      spinner.translatesAutoresizingMaskIntoConstraints = false
+      spinner.hidesWhenStopped = true
+      return spinner
+    }
+  }()
+  
+  // For Pagination
   var pageNumber = 1
   private(set) var isFetching = false
   
-  // MARK: - For Searching
+  // For Searching
   var searchController = UISearchController(searchResultsController: nil)
   var query = ""
   
@@ -39,6 +54,7 @@ class MainViewController: UIViewController {
     super.viewDidLoad()
     getPhotoItems()
     setupCollectionView()
+    setupSpinner()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -47,7 +63,7 @@ class MainViewController: UIViewController {
   }
   
   // MARK: - Helper Methods
-  fileprivate func setupNavBar() {
+  private func setupNavBar() {
     navigationItem.title = "Gallery"
     navigationItem.hidesSearchBarWhenScrolling = false
     navigationItem.searchController = searchController
@@ -55,44 +71,59 @@ class MainViewController: UIViewController {
     setupSearchController()
   }
   
-  fileprivate func setupSearchController() {
+  private func setupSearchController() {
     searchController.searchBar.delegate = self
     searchController.searchBar.placeholder = "Search Images"
     searchController.searchBar.returnKeyType = UIReturnKeyType.search
     searchController.obscuresBackgroundDuringPresentation = false
   }
-    
-  fileprivate func setupCollectionView() {
+  
+  private func setupCollectionView() {
     view.addSubview(collectionView)
     collectionView.fillSuperview()
   }
   
-  fileprivate func getMoreItems() {
+  private func setupSpinner() {
+    view.addSubview(spinner)
+    spinner.centerInSuperview()
+  }
+  
+  // MARK: - API Section
+  private func getMoreItems() {
     getPhotoItems(query: query)
   }
   
-  fileprivate func getPhotoItems(query: String = "") {
+  private func getPhotoItems(query: String = "") {
     isFetching = true
     
-    let completionHandler: (([PhotoItem]?, Error?) -> Void) = { (items, error) in
+    if photoItems.count == 0 {
+      spinner.startAnimating()
+    }
+    
+    let completionHandler: (([PhotoItem]?, Error?) -> Void) = { [weak self] (items, error) in
+      guard let self = self else { return }
+      
       if let error = error {
         self.isFetching = false
+        self.spinner.stopAnimating()
         print("Failed to fetch:", error)
         return
       }
       
       guard let items = items else {
         self.isFetching = false
+        self.spinner.stopAnimating()
         return
       }
       
       for item in items {
-        self.galleryItems.append(item)
+        self.photoItems.append(item)
       }
       
       self.isFetching = false
       
       DispatchQueue.main.async {
+        self.spinner.stopAnimating()
         self.collectionView.reloadData()
       }
     }
@@ -104,9 +135,9 @@ class MainViewController: UIViewController {
     }
   }
   
-  fileprivate func clearPhotoItems() {
+  private func clearPhotoItems() {
     pageNumber = 1
-    galleryItems = [PhotoItem]()
+    photoItems = [PhotoItem]()
     
     DispatchQueue.main.async {
       self.collectionView.reloadData()
@@ -117,12 +148,12 @@ class MainViewController: UIViewController {
 // MARK: - UICollectionViewDataSource Methods
 extension MainViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {    
-    return galleryItems.count
+    return photoItems.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as! PhotoCell
-    cell.photo = galleryItems[indexPath.item]
+    cell.photo = photoItems[indexPath.item]
     return cell
   }
   
@@ -144,7 +175,7 @@ extension MainViewController: UICollectionViewDelegate {
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    let photoItem = galleryItems[indexPath.item]
+    let photoItem = photoItems[indexPath.item]
     let vc = PhotoDetailViewController()
     vc.photoItem = photoItem
     navigationController?.pushViewController(vc, animated: true)
@@ -154,7 +185,7 @@ extension MainViewController: UICollectionViewDelegate {
 // MARK: - WaterfallLayoutDelegate
 extension MainViewController: WaterfallLayoutDelegate {
   func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let photo = galleryItems[indexPath.item]
+    let photo = photoItems[indexPath.item]
     return .init(width: photo.width, height: photo.height)
   }
 }
