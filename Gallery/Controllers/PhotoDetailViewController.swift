@@ -20,12 +20,17 @@ class PhotoDetailViewController: UIViewController {
     }
   }
   
+  // For displaying image
   private let imageView = UIImageView(cornerRadius: 0)
   
+  // For HUD
   private let pagingView: PagingView = {
     let view = PagingView()
     return view
   }()
+  
+  // For Image Saving
+  private lazy var imageSaver = ImageSaver()
   
   // MARK: - View Lifecycle
   override func viewDidLoad() {
@@ -55,13 +60,17 @@ class PhotoDetailViewController: UIViewController {
       
   @objc func downloadBtnPressed() {
     print("downloadBtnPressed")
-    guard let image = imageView.image else { return }
+    imageSaver.successHanlder = { [weak self] in
+      guard let self = self else { return }
+      self.showAlertMsg(msg: "Photo Saved Successfully")
+    }
     
-    UIImageWriteToSavedPhotosAlbum(image, self, #selector(photoSaved), nil)
-  }
-  
-  @objc func photoSaved(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-    print("photoSaved")
-    showAlertMsg(msg: "Photo Saved")
+    imageSaver.errorHandler = { [weak self] in
+      guard let self = self else { return }
+      self.showAlertMsg(msg: "Opps: \($0.localizedDescription)")
+    }
+    
+    guard let image = imageView.image else { return }
+    imageSaver.writeToPhotoAlbum(image: image)
   }
 }
