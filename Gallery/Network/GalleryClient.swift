@@ -8,6 +8,13 @@
 
 import Foundation
 
+protocol GalleryClientService {
+  func loadPhotos(query: String,
+  perPage: Int,
+  pageNumber: Int,
+  completion: @escaping ([PhotoItem]?, Error?) -> Void)
+}
+
 class GalleryClient {
   static let shared = GalleryClient()
   
@@ -71,3 +78,5 @@ class GalleryClient {
     }.resume()
   }
 }
+
+extension GalleryClient: GalleryClientService {}
