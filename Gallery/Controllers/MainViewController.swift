@@ -123,7 +123,7 @@ class MainViewController: UIViewController {
       spinner.startAnimating()
     }
     
-    let completionHandler: (([PhotoItem]?, Error?) -> Void) = { [weak self] (items, error) in
+    GalleryClient.shared.loadPhotos(query: query, perPage: 10, pageNumber: pageNumber) { [weak self] (items, error) in
       guard let self = self else { return }
       
       if let error = error {
@@ -177,13 +177,7 @@ class MainViewController: UIViewController {
           self.collectionView.reloadData()
         }
       }
-    }
-    
-    if query.isEmpty {
-      Service.shared.loadPhotos(perPage: 10, pageNumber: pageNumber, completion: completionHandler)
-    } else {
-      Service.shared.loadPhotos(query: query, perPage: 10, pageNumber: pageNumber, completion: completionHandler)
-    }
+    }    
   }
   
   private func clearPhotoItems() {
