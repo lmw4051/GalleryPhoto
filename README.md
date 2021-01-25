@@ -23,4 +23,4 @@ Use different path and add query for URLQueryItem
 - Create GalleryClientService Protocol Methods for Testing
 
 ## Video Demo
-![image](https://i.imgur.com/DgNOo2h.gifv)
+![Imgur Image](https://i.imgur.com/DgNOo2h.gifv)
