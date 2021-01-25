@@ -21,3 +21,6 @@ Use different path and add query for URLQueryItem
 
 ## Optimization
 - Create GalleryClientService Protocol Methods for Testing
+
+## Video Demo
+![Imgur](https://i.imgur.com/PoiYp7O.mp4)
